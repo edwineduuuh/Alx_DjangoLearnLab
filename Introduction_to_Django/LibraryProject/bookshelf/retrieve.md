@@ -1,5 +1,5 @@
 ```python
-retrieved = Book.objects.first()  
+retrieved = Book.objects.get()  
 >>> print(retrieved.title)
 1984
 >>> print(retrieved.author) 
