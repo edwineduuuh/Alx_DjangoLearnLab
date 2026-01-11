@@ -7,7 +7,6 @@ It sets up a basic Django environment and runs the default development server.
 
 ### Install Django
 Make sure Python is installed, then install Django:
-
 ## 3. Project Structure Overview
 
 - **manage.py** — Command-line tool for interacting with the project.
@@ -19,5 +18,4 @@ Make sure Python is installed, then install Django:
   - **\_\_init\_\_.py** — Marks this directory as a Python package.
 
 ## 4. Purpose
-
 This setup introduces the workflow of Django projects and prepares the environment for building applications within the LibraryProject.
