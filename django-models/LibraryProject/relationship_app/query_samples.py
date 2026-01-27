@@ -46,6 +46,8 @@ def query_books_by_author(author_name):
         author = Author.objects.get(name=author_name)
         # Query all books by this author using filter
         books = Book.objects.filter(author=author)
+
+        Librarian.objects.get(library = Library)
         
         print(f"\n{'='*60}")
         print(f"Books by {author_name}:")
