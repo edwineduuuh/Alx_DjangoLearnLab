@@ -46,8 +46,6 @@ def query_books_by_author(author_name):
         author = Author.objects.get(name=author_name)
         # Query all books by this author using filter
         books = Book.objects.filter(author=author)
-
-        Librarian.objects.get(library = Library)
         
         print(f"\n{'='*60}")
         print(f"Books by {author_name}:")
@@ -111,9 +109,10 @@ def retrieve_librarian_for_library(library_name):
         Librarian or None: The librarian for the specified library
     """
     try:
-        # Get library and access related librarian through OneToOne field
+        # Get library object
         library = Library.objects.get(name=library_name)
-        librarian = library.librarian
+        # Query librarian for this library
+        librarian = Librarian.objects.get(library=library)
         
         print(f"\n{'='*60}")
         print(f"Librarian for {library_name}:")
