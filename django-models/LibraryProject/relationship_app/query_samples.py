@@ -18,11 +18,9 @@ import sys
 import django
 
 # Setup Django environment (only needed if running as standalone script)
-# Adjust the settings module name to match your project
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LibraryProject.settings')
 
 # Add the parent directory to the path so Django can find the project
-# This assumes the script is in: LibraryProject/relationship_app/query_samples.py
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
@@ -44,9 +42,10 @@ def query_books_by_author(author_name):
         QuerySet: All books by the specified author
     """
     try:
-        # Method 1: Get author first, then access related books
+        # Get author object
         author = Author.objects.get(name=author_name)
-        books = author.books.all()  # Using related_name='books'
+        # Query all books by this author using filter
+        books = Book.objects.filter(author=author)
         
         print(f"\n{'='*60}")
         print(f"Books by {author_name}:")
@@ -63,33 +62,6 @@ def query_books_by_author(author_name):
     except Author.DoesNotExist:
         print(f"\nAuthor '{author_name}' not found in database.")
         return Book.objects.none()
-
-
-def query_books_by_author_alternative(author_name):
-    """
-    Alternative method: Query books directly by filtering on author.
-    This is more efficient as it uses a single database query.
-    
-    Args:
-        author_name (str): Name of the author to search for
-        
-    Returns:
-        QuerySet: All books by the specified author
-    """
-    # Method 2: Filter books directly by author name (single query)
-    books = Book.objects.filter(author__name=author_name)
-    
-    print(f"\n{'='*60}")
-    print(f"Books by {author_name} (Alternative Query):")
-    print(f"{'='*60}")
-    
-    if books.exists():
-        for book in books:
-            print(f"  - {book.title}")
-    else:
-        print(f"  No books found for author: {author_name}")
-    
-    return books
 
 
 def list_books_in_library(library_name):
@@ -139,8 +111,6 @@ def retrieve_librarian_for_library(library_name):
     try:
         # Get library and access related librarian through OneToOne field
         library = Library.objects.get(name=library_name)
-        
-        # Access the librarian using related_name='librarian'
         librarian = library.librarian
         
         print(f"\n{'='*60}")
@@ -158,36 +128,9 @@ def retrieve_librarian_for_library(library_name):
         return None
 
 
-def retrieve_librarian_alternative(library_name):
-    """
-    Alternative method: Query librarian directly by filtering on library.
-    
-    Args:
-        library_name (str): Name of the library
-        
-    Returns:
-        Librarian or None: The librarian for the specified library
-    """
-    try:
-        # Method 2: Filter librarian directly by library name
-        librarian = Librarian.objects.get(library__name=library_name)
-        
-        print(f"\n{'='*60}")
-        print(f"Librarian for {library_name} (Alternative Query):")
-        print(f"{'='*60}")
-        print(f"  {librarian.name}")
-        
-        return librarian
-        
-    except Librarian.DoesNotExist:
-        print(f"\nNo librarian found for library: {library_name}")
-        return None
-
-
 def create_sample_data():
     """
     Create sample data for testing the queries.
-    This function demonstrates how to create and link related objects.
     """
     print("\n" + "="*60)
     print("Creating Sample Data...")
@@ -198,7 +141,7 @@ def create_sample_data():
     author2, created = Author.objects.get_or_create(name="George Orwell")
     author3, created = Author.objects.get_or_create(name="Jane Austen")
     
-    # Create Books (with ForeignKey to Author)
+    # Create Books
     book1, created = Book.objects.get_or_create(
         title="Harry Potter and the Philosopher's Stone",
         defaults={'author': author1}
@@ -224,11 +167,11 @@ def create_sample_data():
     library1, created = Library.objects.get_or_create(name="Central Library")
     library2, created = Library.objects.get_or_create(name="City Library")
     
-    # Add books to libraries (ManyToMany relationship)
+    # Add books to libraries
     library1.books.add(book1, book2, book3)
     library2.books.add(book3, book4, book5)
     
-    # Create Librarians (with OneToOne relationship to Library)
+    # Create Librarians
     librarian1, created = Librarian.objects.get_or_create(
         library=library1,
         defaults={'name': 'Alice Johnson'}
